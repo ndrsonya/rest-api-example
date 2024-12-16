@@ -30,7 +30,7 @@ jobs:
     # Build the Docker image
     - name: Build Docker image
       run: |
-        docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/your-app-image .
+        docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example .
 
     # Authenticate with Google Cloud using service account credentials
     - name: Authenticate to Google Cloud
@@ -38,6 +38,13 @@ jobs:
       with:
         credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
+    # Use gcloud SQL Proxy
+    - name: Google cloud SQL Proxy
+      uses: mattes/gce-cloudsql-proxy-action@v1
+      with:
+        creds: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+        instance: ${{ secrets.GCP_CLOUD_SQL_INSTANCE }}
+        
     # Run the Knex migrations using the Docker container
     - name: Run Knex migrations
       run: |
@@ -46,15 +53,16 @@ jobs:
           -e DB_USER=${{ secrets.DB_USER }} \
           -e DB_PASS=${{ secrets.DB_PASS }} \
           -e DB_NAME=${{ secrets.DB_NAME }} \
-          gcr.io/${{ secrets.GCP_PROJECT_ID }}/your-app-image \
-          npm run migrate
+          gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example \
+          npm run migrate    
+        # Push the Docker image to Google Container Registry (GCR)
 
-    # Push the Docker image to Google Container Registry (GCR)
+    # Push Docker image to GCR
     - name: Push Docker image to GCR
       run: |
-        docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/your-app-image
+        docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example
 
-    # Deploy the app (to Google Kubernetes Engine, App Engine, etc.)
+    # Deploy the app 
     - name: Deploy to Google Cloud
       run: |
         gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
