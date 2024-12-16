@@ -1,9 +1,8 @@
-const Knex = require("knex");
-const dotenv = require('dotenv');
+import type { Knex } from 'knex';
+import dotenv from 'dotenv';
 dotenv.config();
 
-/** @type {import("knex").Knex.Config} */
-module.exports = {
+const config: { [key: string]: Knex.Config } = {
     development: {
         client: 'pg',
         connection: {
@@ -22,13 +21,15 @@ module.exports = {
     },
     production: {
         client: 'pg',
-        connection: process.env.DB_CONNECTION_STRING || {
-            host: process.env.DB_HOST || '/cloudsql/YOUR_INSTANCE_CONNECTION_NAME',
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: process.env.DB_NAME,
-            ssl: { rejectUnauthorized: false },  // SSL for Cloud SQL
-        },
+        connection: process.env.DB_CONNECTION_STRING
+            ? process.env.DB_CONNECTION_STRING
+            : {
+                host: process.env.DB_HOST || '/cloudsql/<YOUR_INSTANCE_CONNECTION_NAME>', // Cloud SQL Auth Proxy host for production
+                user: process.env.DB_USER,
+                password: process.env.DB_PASSWORD,
+                database: process.env.DB_NAME,
+                ssl: { rejectUnauthorized: false }, // Use SSL for Cloud SQL
+            },
         migrations: {
             directory: './src/db/migrations',
         },
@@ -37,3 +38,5 @@ module.exports = {
         },
     },
 };
+
+export default config;
