@@ -43,7 +43,7 @@ jobs:
       uses: ahmadnassri/action-google-cloud-sql-proxy@v1
       with:
         key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-        instance: ${{ secrets.GCP_CLOUD_SQL_INSTANCE }}
+        connection: ${{ secrets.GCP_CLOUD_SQL_INSTANCE }}
         port: ${{ secrets.DB_PORT }}
         
     # Run the Knex migrations using the Docker container
