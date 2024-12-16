@@ -45,3 +45,10 @@ steps:
 
 # Timeout to allow for longer builds if necessary
 timeout: '900s'  # Set to 15 minutes
+
+options:
+  # Option 1: Use Cloud Logging to store logs
+  logging: 'CLOUD_LOGGING_ONLY'  # This sends logs directly to Cloud Logging (Stackdriver)
+  
+  # Option 2: If you want to disable logging entirely, use:
+  # logging: 'NONE'  # Disable logging
