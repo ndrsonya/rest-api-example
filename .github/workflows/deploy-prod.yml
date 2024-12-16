@@ -40,10 +40,11 @@ jobs:
 
     # Use gcloud SQL Proxy
     - name: Google cloud SQL Proxy
-      uses: mattes/gce-cloudsql-proxy-action@v1
+      uses: ahmadnassri/action-google-cloud-sql-proxy@v1
       with:
-        creds: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+        key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
         instance: ${{ secrets.GCP_CLOUD_SQL_INSTANCE }}
+        port: ${{ secrets.DB_PORT }}
         
     # Run the Knex migrations using the Docker container
     - name: Run Knex migrations
@@ -51,8 +52,9 @@ jobs:
         docker run --rm \
           -e DB_HOST=${{ secrets.DB_HOST }} \
           -e DB_USER=${{ secrets.DB_USER }} \
-          -e DB_PASS=${{ secrets.DB_PASS }} \
+          -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
           -e DB_NAME=${{ secrets.DB_NAME }} \
+          -e DB_PORT=${{ secrets.DB_PORT }} \
           gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example \
           npm run migrate    
         # Push the Docker image to Google Container Registry (GCR)
