@@ -49,6 +49,7 @@ jobs:
     - name: Run Knex migrations and seeds
       run: |
         npm install
+        npx knex init -x ts
         npx knex migrate:latest --env production
         npx knex seed:run --env production
       env:
