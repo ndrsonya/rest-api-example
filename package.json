@@ -9,7 +9,8 @@
     "build": "tsc",
     "serve": "node dist/index.js",
     "start": "node dist/src/index.js",
-    "knex": "knex"
+    "knex": "knex",
+    "migrate-and-seed": "npm run migrate && npm run seed"
   },
   "author": "",
   "license": "ISC",
