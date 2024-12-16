@@ -10,6 +10,8 @@
     "serve": "node dist/index.js",
     "start": "node dist/src/index.js",
     "knex": "knex",
+    "migrate": "knex migrate:latest",
+    "seed": "knex seed:run",
     "migrate-and-seed": "npm run migrate && npm run seed"
   },
   "author": "",
