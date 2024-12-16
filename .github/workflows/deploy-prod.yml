@@ -1,0 +1,57 @@
+name: Deploy to Google Cloud
+
+on:
+  push:
+    branches:
+      - main  # Trigger the pipeline when pushing to the main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # Run on the latest Ubuntu environment
+
+    steps:
+    # Step 1: Check out the code
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Step 2: Set up Google Cloud SDK
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}  # Reference the GitHub secret for GCP service account key
+        project_id: ${{ secrets.GCP_PROJECT_ID }}  # Reference the GitHub secret for GCP project ID
+
+    # Step 3: Authenticate Docker to Google Container Registry (GCR)
+    - name: Authenticate Docker to GCR
+      run: |
+        gcloud auth configure-docker gcr.io
+
+    # Step 4: Build and push the Docker image to GCR
+    - name: Build and push Docker image
+      run: |
+        docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest .  # Use project ID from secret
+        docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest
+
+    # Step 5: Deploy to Google Cloud Run
+    - name: Deploy to Cloud Run
+      run: |
+        gcloud run deploy rest-api-example \
+          --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest \
+          -region europe-north1 \  # Set the region to Finland
+          --allow-unauthenticated \
+          --set-env-vars DB_HOST=${{ secrets.DB_HOST }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }},DB_NAME=${{ secrets.DB_NAME }}  # Use secrets for sensitive environment variables
+
+    # Step 6: Run database migrations and seeds
+    - name: Run Knex migrations and seeds
+      run: |
+        # Install dependencies (make sure knex and pg are installed)
+        npm install
+
+        # Run migrations
+        npx knex migrate:latest --env production
+
+        # Run seeds (if you want to seed the database)
+        npx knex seed:run --env production
+      env:
+        DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}  # Use the same environment variables for DB credentials
+        NODE_ENV: production 
