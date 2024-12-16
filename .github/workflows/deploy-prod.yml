@@ -50,17 +50,21 @@ jobs:
       run: |
           sleep 10 
 
-    # Run the Knex migrations using the Docker container
+    # Install dependencies
+    - name: Install Dependencies
+      run: |
+        npm install
+
+    # Run Knex Migrations
     - name: Run Knex Migrations
       run: |
-        docker run --rm \
-          -e DB_HOST=localhost \
-          -e DB_PORT=${{ secrets.DB_PORT }} \
-          -e DB_USER=${{ secrets.DB_USER }} \
-          -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-          -e DB_NAME=${{ secrets.DB_NAME }} \
-          gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example npm run knex migrate:latest
-
+        npx knex migrate:latest --env production
+      env:
+        DB_HOST=localhost
+        DB_PORT=${{ secrets.DB_PORT }}
+        DB_USER=${{ secrets.DB_USER }}
+        DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+        DB_NAME=${{ secrets.DB_NAME }}
 
     # Push Docker image to GCR
     - name: Push Docker image to GCR
