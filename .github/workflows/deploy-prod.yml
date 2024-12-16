@@ -45,12 +45,16 @@ jobs:
         key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
         connection: ${{ secrets.GCP_CLOUD_SQL_INSTANCE }}
         port: ${{ secrets.DB_PORT }}
-        
+       
+    - name: Wait for Cloud SQL Proxy to be ready
+      run: |
+          sleep 10 
+
     # Run the Knex migrations using the Docker container
     - name: Run Knex Migrations
       run: |
         docker run --rm \
-          -e DB_HOST=host.docker.internal \
+          -e DB_HOST=localhost \
           -e DB_PORT=${{ secrets.DB_PORT }} \
           -e DB_USER=${{ secrets.DB_USER }} \
           -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
