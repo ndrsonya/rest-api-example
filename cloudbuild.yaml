@@ -1,0 +1,47 @@
+steps:
+  # Step 1: Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/nodejs-app:$SHORT_SHA', '.']
+
+  # Step 2: Install dependencies and run migrations
+  - name: 'node:16'  # Replace with your required Node.js version
+    entrypoint: 'bash'
+    env:
+      - 'DB_USER=$(gcloud secrets versions access latest --secret=db-user)'
+      - 'DB_PASSWORD=$(gcloud secrets versions access latest --secret=db-password)'
+      - 'DB_NAME=$(gcloud secrets versions access latest --secret=db-name)'
+      - 'CLOUDSQL_INSTANCE=$(gcloud secrets versions access latest --secret=cloudsql-instance)'
+    args:
+      - '-c'
+      - |
+        npm install
+        DB_HOST="/cloudsql/$CLOUDSQL_INSTANCE"
+        echo "Running migrations on $DB_HOST"
+        npm run knex migrate:latest  # Assuming knex is set up with the appropriate environment variables
+
+  # Step 3: Push the Docker image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/nodejs-app:$SHORT_SHA']
+
+  # Step 4: Deploy to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      [
+        'run',
+        'deploy',
+        'nodejs-app',
+        '--image',
+        'gcr.io/$PROJECT_ID/nodejs-app:$SHORT_SHA',
+        '--platform',
+        'managed',
+        '--region',
+        'europe-north1',  # Finland region
+        '--allow-unauthenticated',
+        '--set-env-vars',
+        'DB_USER=$(gcloud secrets versions access latest --secret=db-user),DB_PASSWORD=$(gcloud secrets versions access latest --secret=db-password),DB_NAME=$(gcloud secrets versions access latest --secret=db-name),DB_HOST=/cloudsql/$(gcloud secrets versions access latest --secret=cloudsql-instance)',  # Inject secrets into the Cloud Run container
+        '--add-cloudsql-instances',
+        '$(gcloud secrets versions access latest --secret=cloudsql-instance)'  # Pass Cloud SQL instance connection name for Cloud Run
+      ]
+
+# Timeout to allow for longer builds if necessary
+timeout: '900s'  # Set to 15 minutes
