@@ -42,9 +42,9 @@ jobs:
       run: |
         gcloud run deploy rest-api-example \
           --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest \
-          --region europe-north1 \  # Set the region to Finland
+          --region europe-north1 \
           --allow-unauthenticated \
-          --set-env-vars DB_HOST=${{ secrets.DB_HOST }},DB_USER=${{ secrets.DB_USER }},DB_PASSWORD=${{ secrets.DB_PASSWORD }},DB_NAME=${{ secrets.DB_NAME }}  # Use secrets for environment variables
+          --set-env-vars DB_CONNECTION_STRING=${{ secrets.DB_CONNECTION_STRING }},NODE_ENV=production  # Pass both DB connection string and NODE_ENV as environment variables
 
     # Step 7: Run database migrations and seeds
     - name: Run Knex migrations and seeds
@@ -58,5 +58,5 @@ jobs:
         # Run seeds 
         npx knex seed:run --env production
       env:
-        DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }} 
-        NODE_ENV: production 
+        DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}  # Ensure the connection string is available for the migrations
+        NODE_ENV: production  # Set the environment to production for migrations
