@@ -26,44 +26,45 @@ jobs:
       with:
         project_id: ${{ secrets.GCP_PROJECT_ID }}  # Your Google Cloud project ID
 
-    # Step 4: Authenticate Docker to GCR (Google Container Registry)
-    - name: Authenticate Docker to GCR
+      # Step 4: Start the Cloud SQL Auth Proxy
+    - name: Start Cloud SQL Auth Proxy
       run: |
-        gcloud auth configure-docker gcr.io
+        wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
+        chmod +x cloud_sql_proxy
+        ./cloud_sql_proxy \
+          -instances=${{ secrets.GCP_PROJECT_ID }}:${{ secrets.GCP_REGION }}:${{ secrets.DB_INSTANCE }}=tcp:5432 &
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
     # Step 5: Build and push the Docker image to GCR
     - name: Build and push Docker image
       run: |
-        docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest .  # Use your project ID
+        docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest .
         docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest
 
-      # Step 6: Run Knex migrations
+    # Step 6: Run Knex migrations
     - name: Run Knex migrations
       run: |
         docker run --rm \
-          -e DB_CONNECTION_STRING=${{ secrets.DB_CONNECTION_STRING }} \
+          -e DB_CONNECTION_STRING=postgres://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@127.0.0.1:5432/${{ secrets.DB_NAME }} \
+          -e NODE_ENV=production \
           gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest \
-          npm run knex migrate:latest  # Run migrations
-      env:
-        DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}  # Pass DB connection string as an environment variable
-        NODE_ENV: production
+          npm run knex migrate:latest
 
     # Step 7: Run Knex seeds
     - name: Run Knex seeds
       run: |
         docker run --rm \
-          -e DB_CONNECTION_STRING=${{ secrets.DB_CONNECTION_STRING }} \
+          -e DB_CONNECTION_STRING=postgres://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@127.0.0.1:5432/${{ secrets.DB_NAME }} \
+          -e NODE_ENV=production \
           gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest \
-          npm run knex seed:run  # Run seeds
-      env:
-        DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}  # Pass DB connection string as an environment variable
-        NODE_ENV: production
+          npm run knex seed:run
 
     # Step 8: Deploy to Cloud Run
     - name: Deploy to Cloud Run
       run: |
         gcloud run deploy rest-api-example \
           --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest \
-          --region europe-north1 \
+          --region ${{ secrets.GCP_REGION }} \
           --allow-unauthenticated \
-          --set-env-vars DB_CONNECTION_STRING=${{ secrets.DB_CONNECTION_STRING }},NODE_ENV=production  # Pass both DB connection string and NODE_ENV as environment variables
+          --set-env-vars NODE_ENV=production,DB_CONNECTION_STRING=postgres://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@127.0.0.1:5432/${{ secrets.DB_NAME }}
