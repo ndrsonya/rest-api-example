@@ -50,8 +50,8 @@ jobs:
         # Run migrations
         npx knex migrate:latest --env production
 
-        # Run seeds (if you want to seed the database)
+        # Run seeds 
         npx knex seed:run --env production
       env:
-        DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}  # Use the same environment variables for DB credentials
+        DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }} 
         NODE_ENV: production 
