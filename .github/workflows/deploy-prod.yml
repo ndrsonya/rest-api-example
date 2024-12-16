@@ -48,14 +48,9 @@ jobs:
     # Step 7: Run database migrations and seeds
     - name: Run Knex migrations and seeds
       run: |
-        # Install dependencies (make sure knex and pg are installed)
         npm install
-
-        # Run migrations using ts-node
-        npx ts-node -r ts-node/register ./node_modules/knex/bin/cli.js migrate:latest --env production
-
-        # Run seeds using ts-node
-        npx ts-node -r ts-node/register ./node_modules/knex/bin/cli.js seed:run --env production
+        npx knex migrate:latest --env production
+        npx knex seed:run --env production
       env:
+        DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
         NODE_ENV: production
-        DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}  # Ensure the connection string is available for the migrations
