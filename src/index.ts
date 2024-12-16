@@ -5,20 +5,7 @@ import knex from './db/knex';
 const app: Express = express();
 const port = process.env.PORT || 8080;
 
-// Function to validate DB connection
-async function validateDbConnection() {
-    try {
-        const result = await knex.raw('SELECT 1');
-        console.log('Database connection successful:');
-    } catch (error) {
-        console.error('Database connection failed:');
-    } finally {
-        knex.destroy();
-    }
-}
 
-// Run the validation
-validateDbConnection();
 
 // Middleware to parse JSON
 app.use(express.json());
@@ -51,4 +38,11 @@ app.get('/devices/:user_id', async (req: Request, res: Response): Promise<any> =
 // Start the server
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
+    knex.raw('SELECT 1+1 AS result')
+        .then(() => {
+            console.log('Successfully connected to the database');
+        })
+        .catch((err) => {
+            console.error('Error connecting to the database', err);
+        });
 });

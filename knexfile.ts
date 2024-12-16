@@ -6,11 +6,11 @@ const config: { [key: string]: Knex.Config } = {
     development: {
         client: 'pg',
         connection: {
-            host: 'localhost',
-            port: 5432,
-            user: 'postgres',
-            password: 'postgres',
-            database: 'postgres',
+            host: process.env.DB_HOST,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_NAME,
+            ssl: false
         },
         migrations: {
             directory: './src/db/migrations',
@@ -28,7 +28,7 @@ const config: { [key: string]: Knex.Config } = {
                 user: process.env.DB_USER,
                 password: process.env.DB_PASSWORD,
                 database: process.env.DB_NAME,
-                ssl: { rejectUnauthorized: false }, // Use SSL for Cloud SQL
+                ssl: false // Use SSL for Cloud SQL
             },
         migrations: {
             directory: './src/db/migrations',
