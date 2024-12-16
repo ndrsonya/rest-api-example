@@ -25,7 +25,6 @@ jobs:
       uses: google-github-actions/setup-gcloud@v1
       with:
         project_id: ${{ secrets.GCP_PROJECT_ID }}  # Your Google Cloud project ID
-        install_components: 'docker,cloud-run'  # Install Docker and Cloud Run components
 
     # Step 4: Authenticate Docker to GCR (Google Container Registry)
     - name: Authenticate Docker to GCR
