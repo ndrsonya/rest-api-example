@@ -28,15 +28,16 @@ jobs:
 
 
       # Step 4: Authenticate Docker to GCR (Google Container Registry)
-    - name: Authenticate Docker to GCR
+    - name: Authenticate Docker to Artifact Registry
       run: |
-        gcloud auth configure-docker gcr.io
-      # Step 5: Build and push the Docker image to GCR
-    - name: Build and push Docker image
+        gcloud auth configure-docker europe-north1-docker.pkg.dev
+    
+    # Step 5: Build and push the Docker image to Artifact Registry
+    - name: Build and push Docker image to Artifact Registry
       run: |
-        docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest .
-        docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest
-      # Step 6: Deploy to Cloud Run
+        docker build -t europe-north1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.ARTIFACT_REGISTRY_REPOSITORY_NAME }}/rest-api-example:latest .
+        docker push europe-north1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.ARTIFACT_REGISTRY_REPOSITORY_NAME }}/rest-api-example:latest
+  
     - name: Deploy to Cloud Run
       run: |
         gcloud run deploy rest-api-example \
@@ -44,30 +45,4 @@ jobs:
           --region ${{ secrets.GCP_REGION }} \
           --allow-unauthenticated \
           --set-env-vars NODE_ENV=production
-#    # Use gcloud SQL Proxy
-#   - name: Google cloud SQL Proxy
-#      uses: ahmadnassri/action-google-cloud-sql-proxy@v1
-#     with:
-#        key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-#        connection: ${{ secrets.GCP_CLOUD_SQL_INSTANCE }}
-#        port: ${{ secrets.DB_PORT }}
-#       
-#    - name: Wait for Cloud SQL Proxy to be ready
-#      run: |
-#          sleep 10 
-#
-#    # Install dependencies
-#    - name: Install Dependencies
-#      run: |
-#        npm install
-#
-#    # Run Knex Migrations
-#    - name: Run Knex Migrations
-#      run: |
-#        npx knex migrate:latest --env production
-#      env:
-#        DB_HOST: localhost
-#        DB_PORT: ${{ secrets.DB_PORT }}
-#        DB_USER: ${{ secrets.DB_USER }}
-#        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-#        DB_NAME: ${{ secrets.DB_NAME }}
+
