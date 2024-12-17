@@ -49,7 +49,7 @@ jobs:
             --set-env-vars DB_PORT=${{ secrets.DB_PORT }} \
             --set-env-vars DB_USER=${{ secrets.DB_USER }}\
             --set-env-vars DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-            --set-env-vars DB_NAME=${{ secrets.DB_NAME }}/ \
+            --set-env-vars DB_NAME=${{ secrets.DB_NAME }} \
             --set-env-vars NODE_ENV=production
 #    # Use gcloud SQL Proxy
 #   - name: Google cloud SQL Proxy
