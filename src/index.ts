@@ -43,6 +43,7 @@ app.listen(port, () => {
             console.log('Successfully connected to the database');
         })
         .catch((err) => {
-            console.error('Error connecting to the database', err);
+            console.log('Cant connect to the database');
+            console.log(err);
         });
 });

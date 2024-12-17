@@ -1,12 +1,12 @@
 import { Knex } from 'knex';
-import cuid from '@paralleldrive/cuid2';
+import { createId } from '@paralleldrive/cuid2';
 
 export async function seed(knex: Knex): Promise<void> {
     await knex('device').del();
 
     const devices = Array.from({ length: 10 }).map(() => ({
-        device_id: cuid,
-        user_id: cuid,
+        device_id: createId(),
+        user_id: createId(),
         last_charging_timestamp: null
     }));
 
