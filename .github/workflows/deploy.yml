@@ -44,7 +44,7 @@ jobs:
             --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest \
             --region ${{ secrets.GCP_REGION }} \
             --platform managed \          
-            --allow-unauthenticated \
+            --allow-unauthenticated 
 
 #    # Use gcloud SQL Proxy
 #   - name: Google cloud SQL Proxy
