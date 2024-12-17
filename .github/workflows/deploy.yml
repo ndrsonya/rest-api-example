@@ -32,5 +32,3 @@ jobs:
       run: |
           gcloud run deploy rest-api-example-service \
           --image europe-north1.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.ARTIFACT_REGISTRY_REPOSITORY_NAME}}/rest-api-example:latest\
-          --platform managed \
-          --allow-unauthenticated 
