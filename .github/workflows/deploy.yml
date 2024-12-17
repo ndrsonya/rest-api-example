@@ -35,7 +35,7 @@ jobs:
     # Step 5: Build and push the Docker image to Artifact Registry
     - name: Build and push Docker image to Artifact Registry
       run: |
-        docker build -t europe-north1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.ARTIFACT_REGISTRY_REPOSITORY_NAME }}/rest-api-example:latest .
+        docker buildx build --tag europe-north1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.ARTIFACT_REGISTRY_REPOSITORY_NAME }}/rest-api-example:latest .
         docker push europe-north1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.ARTIFACT_REGISTRY_REPOSITORY_NAME }}/rest-api-example:latest
   
     - name: Deploy to Cloud Run
