@@ -1,5 +1,17 @@
 import express, { Request, Response, Express } from 'express';
 import knex from './db/knex';
+const winston = require('winston');
+
+// Create a logger instance
+const logger = winston.createLogger({
+    level: 'info', // Set log level to 'info'
+    format: winston.format.simple(),
+    transports: [
+        new winston.transports.Console({ format: winston.format.combine(winston.format.colorize(), winston.format.simple()) }),
+        new winston.transports.File({ filename: 'app.log' }) // Optionally, log to a file as well
+    ]
+});
+
 
 // Create Express application
 const app: Express = express();
@@ -30,7 +42,7 @@ app.get('/devices/:user_id', async (req: Request, res: Response): Promise<any> =
 
         return res.status(200).json(devices);
     } catch (error) {
-        console.error('Error fetching devices:', error);
+        logger.error('Error fetching devices:', error);
         return res.status(500).json({ message: 'Internal server error.' });
     }
 });
@@ -40,10 +52,10 @@ app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
     knex.raw('SELECT 1+1 AS result')
         .then(() => {
-            console.log('Successfully connected to the database');
+            logger.info('Successfully connected to the database');
         })
         .catch((err) => {
-            console.log('Cant connect to the database');
-            console.log(err);
+            logger.error('Cant connect to the database');
+            logger.error(err);
         });
 });
