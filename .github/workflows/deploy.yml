@@ -27,25 +27,23 @@ jobs:
         project_id: ${{ secrets.GCP_PROJECT_ID }}  # Your Google Cloud project ID
 
 
-    # Step 4: Authenticate Docker to GCR (Google Container Registry)
+      # Step 4: Authenticate Docker to GCR (Google Container Registry)
     - name: Authenticate Docker to GCR
       run: |
         gcloud auth configure-docker gcr.io
-    # Step 5: Build and push the Docker image to GCR
+      # Step 5: Build and push the Docker image to GCR
     - name: Build and push Docker image
       run: |
         docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest .
         docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest
-        
-    # Step 5: Build and push the Docker image to GCR
+      # Step 6: Deploy to Cloud Run
     - name: Deploy to Cloud Run
       run: |
-          gcloud run deploy rest-api-example \
-            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest \
-            --region ${{ secrets.GCP_REGION }} \
-            --platform managed \          
-            --allow-unauthenticated 
-
+        gcloud run deploy rest-api-example \
+          --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest \
+          --region ${{ secrets.GCP_REGION }} \
+          --allow-unauthenticated \
+          --set-env-vars NODE_ENV=production,DB_CONNECTION_STRING=postgres://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DB_NAME }}
 #    # Use gcloud SQL Proxy
 #   - name: Google cloud SQL Proxy
 #      uses: ahmadnassri/action-google-cloud-sql-proxy@v1
