@@ -36,16 +36,20 @@ jobs:
       run: |
         docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest .
         docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest
-     
-    # Step 6: Deploy to Cloud Run
+        
+    # Step 5: Build and push the Docker image to GCR
     - name: Deploy to Cloud Run
       run: |
-        gcloud run deploy rest-api-example \
-          --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest \
-          --region ${{ secrets.GCP_REGION }} \
-          --allow-unauthenticated \
-          --set-env-vars NODE_ENV=production,DB_CONNECTION_STRING=postgres://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@127.0.0.1:5432/${{ secrets.DB_NAME }}
-
+          gcloud run deploy rest-api-example \
+            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest \
+            --region europe-north1 \
+            --platform managed \
+            --set-secrets DB_HOST=projects/${{ secrets.GCP_PROJECT_ID }}/secrets/DB_HOST:latest \
+            --set-secrets DB_PORT=projects/${{ secrets.GCP_PROJECT_ID }}/secrets/DB_PORT:latest \
+            --set-secrets DB_USER=projects/${{ secrets.GCP_PROJECT_ID }}/secrets/DB_USER:latest \
+            --set-secrets DB_PASSWORD=projects/${{ secrets.GCP_PROJECT_ID }}/secrets/DB_PASSWORD:latest \
+            --set-secrets DB_NAME=projects/${{ secrets.GCP_PROJECT_ID }}/secrets/DB_NAME:latest \
+            --set-env-vars NODE_ENV=production
 #    # Use gcloud SQL Proxy
 #   - name: Google cloud SQL Proxy
 #      uses: ahmadnassri/action-google-cloud-sql-proxy@v1
