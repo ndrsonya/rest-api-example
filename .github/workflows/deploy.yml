@@ -28,10 +28,5 @@ jobs:
         gcloud auth configure-docker europe-north1-docker.pkg.dev
         docker build -t europe-north1-docker.pkg.dev/$GOOGLE_PROJECT/cloud-rest-api-repo/rest-api-example:latest .
         docker push europe-north1-docker.pkg.dev/$GOOGLE_PROJECT/cloud-rest-api-repo/rest-api-example:latest
-    - name: Deploy to Cloud Run
-      run: |
-            gcloud run deploy rest-api-example-service \
-            --image "europe-north1.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.ARTIFACT_REGISTRY_REPOSITORY_NAME }}/rest-api-example:latest" \
-            --region europe-north1 \
-            --allow-unauthenticated
+
       
