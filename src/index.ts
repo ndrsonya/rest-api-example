@@ -1,56 +1,32 @@
-import express, { Request, Response, Express } from 'express';
-import knex from './db/knex';
-const winston = require('winston');
+import express, { Express } from 'express';
+import dotenv from 'dotenv';
+import deviceRoutes from './routes/deviceRoutes';
+import db from './db/knex';
+import logger from './config/logger';
 
-// Create a logger instance
-const logger = winston.createLogger({
-    level: 'info', // Set log level to 'info'
-    format: winston.format.simple(),
-    transports: [
-        new winston.transports.Console({ format: winston.format.combine(winston.format.colorize(), winston.format.simple()) }),
-        new winston.transports.File({ filename: 'app.log' }) // Optionally, log to a file as well
-    ]
-});
-
+// Initialize environment variables
+dotenv.config();
 
 // Create Express application
 const app: Express = express();
 const port = process.env.PORT || 8080;
 
-
-
 // Middleware to parse JSON
 app.use(express.json());
 
+// Set up routes
+app.use(deviceRoutes);
+
 // Default route
-app.get('/', (req: Request, res: Response) => {
+app.get('/', (req, res) => {
     res.send('Hello, TypeScript Express!');
-});
-
-// Endpoint to get devices by user_id
-app.get('/devices/:user_id', async (req: Request, res: Response): Promise<any> => {
-    const { user_id } = req.params;
-
-    try {
-        const devices = await knex('device').where({ user_id });
-
-
-        if (devices.length === 0) {
-            return res.status(404).json({ message: 'No devices found for the given user_id.' });
-        }
-
-
-        return res.status(200).json(devices);
-    } catch (error) {
-        logger.error('Error fetching devices:', error);
-        return res.status(500).json({ message: 'Internal server error.' });
-    }
 });
 
 // Start the server
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
-    knex.raw('SELECT 1+1 AS result')
+
+    db.raw('SELECT 1+1 AS result')
         .then(() => {
             logger.info('Successfully connected to the database');
         })
