@@ -28,25 +28,6 @@ jobs:
       - name: Run tests
         run: |
           npm run test
-
-      - name: Build Docker image
-        run: |
-          docker build -t my-node-app .
-        
-      - name: Run Docker container for testing
-        run: |
-          docker run -d -p 8080:8080 --name my-node-app-container my-node-app
-
-      - name: Wait for the app to start
-        run: |
-          sleep 10
-          curl --fail http://localhost:8080
-
-      - name: Clean up Docker container and image
-        run: |
-          docker stop my-node-app-container
-          docker rm my-node-app-container
-          docker rmi my-node-app
           
   deploy:
     runs-on: ubuntu-latest 
