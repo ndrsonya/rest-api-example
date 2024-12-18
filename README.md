@@ -2,7 +2,7 @@
 
 
 ## Description
-This is a simple REST API app build to demo backed skills. The API provides endpoints to manage and manipulate customer device data stored in the database.
+This is a simple REST API app build to demo backend development skills. The API provides endpoints to manage and manipulate customer device data stored in the database.
 
 
 ## Tech Stack
