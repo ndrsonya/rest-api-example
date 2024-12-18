@@ -14,7 +14,7 @@
     "seed": "ts-node -r tsconfig-paths/register ./node_modules/.bin/knex seed:run",
     "migrate-and-seed": "npm run migrate && npm run seed",
     "lint": "eslint 'src/**/*.{ts,js}'",
-    "lint:fix": "eslint 'src/**/*.{ts,js}' --fix" 
+    "lint:fix": "eslint 'src/**/*.{ts,js}' --fix"
   },
   "author": "",
   "license": "ISC",
