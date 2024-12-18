@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import deviceRoutes from './routes/deviceRoutes';
 import db from './db/knex';
 import logger from './config/logger';
+import statusRoutes from './routes/statusRoutes';
 
 // Initialize environment variables
 dotenv.config();
@@ -17,6 +18,8 @@ app.use(express.json());
 // Set up routes
 app.use(deviceRoutes);
 
+app.use(statusRoutes);
+
 // Default route
 app.get('/', (req, res) => {
     res.send('Hello, TypeScript Express!');
@@ -24,7 +27,7 @@ app.get('/', (req, res) => {
 
 // Start the server
 app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+    logger.info(`Server running at http://localhost:${port}`);
 
     db.raw('SELECT 1+1 AS result')
         .then(() => {
