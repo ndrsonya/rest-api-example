@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES6",
     "module": "CommonJS",
-    "outDir": "./dist",  // Ensure the compiled JavaScript goes into the dist folder  // Assuming your TypeScript files are in a src folder
+    "outDir": "./dist",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "strict": true
