@@ -1,13 +1,14 @@
 name: Deploy to Google Cloud
 
 on:
-  push:
-    branches:
-      - main  # Trigger the pipeline when pushing to the main branch
+  workflow_run:
+    workflows: ["Node.js CI with Docker Build"] 
+    types:
+      - completed  # Trigger CD only when CI workflow has completed successfully
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest  # Run on the latest Ubuntu environment
+    runs-on: ubuntu-latest 
 
     steps:
     # Step 1: Check out the code
@@ -27,12 +28,12 @@ jobs:
         project_id: ${{ secrets.GCP_PROJECT_ID }}  # Your Google Cloud project ID
 
 
-      # Step 4: Authenticate Docker to GCR (Google Container Registry)
+    # Step 4: Authenticate Docker to GCR (Google Container Registry)
     - name: Authenticate Docker to GCR
       run: |
         gcloud auth configure-docker gcr.io
         
-      # Step 5: Build and push the Docker image to GCR
+    # Step 5: Build and push the Docker image to GCR
     - name: Build and push Docker image
       run: |
         docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest .
