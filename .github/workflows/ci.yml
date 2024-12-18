@@ -1,9 +1,6 @@
 name: Node.js CI with Docker Build
 
 on:
-    push:
-      branches:
-        - main  # Trigger CI on push to main branch
     pull_request:
       branches:
         - main  # Trigger CI on pull request to main branch
