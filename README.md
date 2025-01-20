@@ -15,7 +15,7 @@ This is a simple REST API app build to demo backend development skills. The API 
   
 
 ## API live 🥳
-Feel free to check out the API docs and try calling endpoints  [✨here✨](https://rest-api-example-441248121323.europe-north1.run.app/api-docs)
+Temporarily off due to free tier google cloud plan  🤪
 
 
 
@@ -67,5 +67,6 @@ Please note, that for local developemt local PostgreSQL instance is used, the de
 2. Create .env file in the project root folder and copy there contect from .env.example
 3. run `npm run migrate-and-seed`
 4. run the app with `npm run dev`
-5. run tests `npm run test`
-6. run linter `npm run lint`
+5. check out swagger docs at http://localhost:8080/api-docs/
+6. run tests `npm run test`
+7. run linter `npm run lint`
