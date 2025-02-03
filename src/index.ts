@@ -6,25 +6,20 @@ import logger from './config/logger';
 import statusRoutes from './routes/statusRoutes';
 import { swaggerSpec, swaggerUi } from './config/swaggerConfig';
 
-// Initialize environment variables
 dotenv.config();
 
-// Create Express application
 const app: Express = express();
 const port = process.env.PORT || 8080;
 
-// Middleware to parse JSON
+
 app.use(express.json());
 
-// Set up routes
 app.use(deviceRoutes);
 
 app.use(statusRoutes);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-
-// Start the server
 app.listen(port, () => {
     logger.info(`Server running at http://localhost:${port}, go to http://localhost:${port}/api-docs to check the docs'`);
 
