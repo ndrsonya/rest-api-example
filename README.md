@@ -38,7 +38,7 @@ This project provides an API for managing user devices and checking the API's he
 ### Project Setup
 1. Clone the repository:
    ```bash
-   git clone[https://github.com/ndrsonya/rest-api-example ](https://github.com/ndrsonya/rest-api-example)
+   git clone https://github.com/ndrsonya/rest-api-example
    cd rest-api-example
    ```
 
