@@ -1,4 +1,4 @@
-FROM node:18
+FROM node:22
 
 # Set build-time argument
 ARG DB_HOST
