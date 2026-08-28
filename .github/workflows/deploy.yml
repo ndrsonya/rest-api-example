@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [16.x] 
+        node-version: [22.x]
 
     steps:
       - name: Check out code
@@ -24,6 +24,10 @@ jobs:
       - name: Install dependencies
         run: |
           npm install
+
+      - name: Typecheck
+        run: |
+          npm run typecheck
 
       - name: Run tests
         run: |

@@ -3,9 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.ts",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
+    "typecheck": "tsc --noEmit",
     "serve": "node dist/index.js",
     "start": "node dist/src/index.js",
     "knex": "knex",
@@ -23,6 +27,7 @@
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",
     "@types/knex": "^0.16.1",
+    "@types/morgan": "^1.9.10",
     "@types/node": "^22.10.2",
     "@types/supertest": "^6.0.2",
     "@types/swagger-jsdoc": "^6.0.4",
@@ -42,7 +47,9 @@
     "@paralleldrive/cuid2": "^2.2.2",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "helmet": "^8.3.0",
     "knex": "^3.1.0",
+    "morgan": "^1.12.0",
     "pg": "^8.13.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
