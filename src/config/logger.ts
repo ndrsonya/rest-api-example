@@ -9,4 +9,8 @@ const logger = winston.createLogger({
     ]
 });
 
+export const stream = {
+    write: (message: string) => logger.info(message.trim()),
+};
+
 export default logger;
