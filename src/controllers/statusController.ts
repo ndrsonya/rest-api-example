@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import knex from '../db/knex';
+import knex from '../config/database';
 import { handleResponse, handleError } from '../helpers/responseHandler';
 
 export const getStatus = async (req: Request, res: Response): Promise<void> => {

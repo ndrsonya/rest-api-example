@@ -1,5 +1,5 @@
 
-import db from '../db/knex';
+import db from '../config/database';
 import { Device } from '../types/deviceTypes';
 import logger from '../config/logger';
 

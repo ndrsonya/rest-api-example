@@ -117,25 +117,38 @@ http://localhost:8080/api-docs
 ---
 
 ## Project Structure
+
+A layered architecture: routes hand off to controllers, controllers call a thin service layer, services call the repository, and the repository talks to the DB via Knex.
+
 ```
 src
+├── app.ts                  -- Express app construction (middleware, routes, error handling)
+├── index.ts                -- starts the server, handles graceful shutdown
 ├── config
+│   └── database.ts
 │   └── logger.ts
 │   └── swaggerConfig.ts
 ├── controllers
 │   └── deviceController.ts
 │   └── statusController.ts
-├── db
-│   └── knex.ts
 ├── helpers
 │   └── responseHandler.ts
+├── middleware
+│   └── errorHandler.ts
+│   └── notFoundHandler.ts
 ├── repositories
 │   └── deviceRepository.ts
 ├── routes
 │   └── deviceRoutes.ts
 │   └── statusRoutes.ts
+├── services
+│   └── deviceService.ts
 └── types
     └── deviceTypes.ts
+
+migrations/                 -- Knex schema migrations (project root)
+seeds/                      -- Knex seed data (project root)
+knexfile.ts                 -- Knex CLI config (project root)
 ```
 
 ---
