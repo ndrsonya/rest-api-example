@@ -140,34 +140,20 @@ A layered architecture: routes hand off to controllers, controllers call a thin 
 
 ```
 src
-├── app.ts                  -- Express app construction (middleware, routes, error handling)
-├── index.ts                -- starts the server, handles graceful shutdown
-├── config
-│   └── database.ts
-│   └── logger.ts
-│   └── swaggerConfig.ts
-├── controllers
-│   └── todoController.ts
-│   └── statusController.ts
-├── helpers
-│   └── responseHandler.ts
-│   └── databaseHealthCheck.ts
-├── middleware
-│   └── errorHandler.ts
-│   └── notFoundHandler.ts
-├── repositories
-│   └── todoRepository.ts
-├── routes
-│   └── todoRoutes.ts
-│   └── statusRoutes.ts
-├── services
-│   └── todoService.ts
-└── types
-    └── todoTypes.ts
+├── app.ts          -- Express app construction (middleware, routes, error handling)
+├── index.ts        -- starts the server, handles graceful shutdown
+├── config          -- app-wide configuration and setup
+├── controllers     -- handles incoming requests and outgoing responses
+├── helpers         -- shared, reusable utility functions
+├── middleware      -- cross-cutting Express middleware
+├── repositories    -- data access layer
+├── routes          -- API route definitions
+├── services        -- business logic layer
+└── types           -- shared TypeScript type definitions
 
-migrations/                 -- Knex schema migrations (project root)
-seeds/                      -- Knex seed data (project root)
-knexfile.ts                 -- Knex CLI config (project root)
+migrations/          -- Knex schema migrations (project root)
+seeds/               -- Knex seed data (project root)
+knexfile.ts          -- Knex CLI config (project root)
 ```
 
 ---
@@ -204,6 +190,13 @@ npm run dev
 ### Lint the Code
 ```bash
 npm run lint
+```
+
+### Run Tests
+```bash
+npm test                  # unit tests - mocked collaborators, no Docker required
+npm run test:integration  # integration tests - spins up a real Postgres via testcontainers, requires Docker
+npm run test:all          # both, one after the other
 ```
 
 ---
