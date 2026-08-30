@@ -20,21 +20,6 @@ This project provides an API for managing user todos and checking the API's heal
 - [ ] Docker installed on your machine
 - [ ] Node installed
 
-### Set up local DB
-1. In the project root folder run `docker compose build`
-2. In the project root folder run `docker compose up -d` (runs postgres and PG Admin)
-3. Go to http://localhost:8001 in browser. You'll see a pgAdmin login page
-4. login with email `admin@admin.com` and password `admin`
-5. Right Click on "Servers" -> "Create" -> "Server..."
-
-  ![Screenshot 2024-12-18 at 15 55 09](https://github.com/user-attachments/assets/2c8e0d9e-6173-4b32-90c9-1d30c970bdfd)
-
-6. on "General" tab give server some name
-7. on "Connection" tab set the following Host: postgres, username: postgress, password: postgres
-
-  ![Screenshot 2024-12-18 at 15 57 43](https://github.com/user-attachments/assets/b72598a8-c47d-4461-8c25-0133e39c4b79)
-8. Click "Save"
-
 ### Project Setup
 1. Clone the repository:
    ```bash
@@ -50,16 +35,26 @@ This project provides an API for managing user todos and checking the API's heal
 3. Set up environment variables by creating a `.env` file in the root directory with the following content:
    ```env
    PORT=8080
-   DB_HOST=postgres
+   DB_HOST=127.0.0.1
+   DB_PORT=5432
    DB_USER=postgres
    DB_PASSWORD=postgres
    DB_NAME=postgres
    ```
 
-4. Run database migrations:
-   ```bash
-   npx knex migrate:latest
-   ```
+### Set up local DB
+Run:
+```bash
+npm run db:up
+```
+This starts Postgres and pgAdmin via `docker compose` (waiting until Postgres is actually ready to accept connections), then runs migrations and seeds in one shot - no manual pgAdmin clicking required.
+
+If you just want the containers without migrating/seeding, `docker compose up -d --wait` on its own works too; `npm run migrate-and-seed` can be run separately whenever you need to re-apply migrations/seeds.
+
+**Optional - inspect the DB visually:**
+1. Go to http://localhost:8001 and log in with email `admin@admin.com` and password `admin`.
+2. A server named **rest-api-example** is already registered (pointing at the `postgres` container) - no need to create one manually.
+3. Expand it; the first time, pgAdmin will ask for the database password (`postgres`) - check "Save Password" so you won't be asked again.
 
 ---
 

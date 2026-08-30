@@ -16,6 +16,7 @@
     "migrate": "ts-node -r tsconfig-paths/register ./node_modules/.bin/knex migrate:latest",
     "seed": "ts-node -r tsconfig-paths/register ./node_modules/.bin/knex seed:run",
     "migrate-and-seed": "npm run migrate && npm run seed",
+    "db:up": "docker compose up -d --wait && npm run migrate-and-seed",
     "lint": "eslint 'src/**/*.{ts,js}'",
     "lint:fix": "eslint 'src/**/*.{ts,js}' --fix",
     "test": "jest",
