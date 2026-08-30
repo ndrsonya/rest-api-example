@@ -2,10 +2,10 @@ import express, { Express } from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { Knex } from 'knex';
-import { createDeviceRoutes } from './routes/deviceRoutes';
+import { createTodoRoutes } from './routes/todoRoutes';
 import { createStatusRoutes } from './routes/statusRoutes';
-import { createDeviceRepository } from './repositories/deviceRepository';
-import { createDeviceService } from './services/deviceService';
+import { createTodoRepository } from './repositories/todoRepository';
+import { createTodoService } from './services/todoService';
 import { swaggerSpec, swaggerUi } from './config/swaggerConfig';
 import { stream } from './config/logger';
 import { notFoundHandler } from './middleware/notFoundHandler';
@@ -19,10 +19,10 @@ export const createApp = (db: Knex): Express => {
     app.use(morgan('combined', { stream }));
     app.use(express.json());
 
-    const deviceRepository = createDeviceRepository(db);
-    const deviceService = createDeviceService(deviceRepository);
+    const todoRepository = createTodoRepository(db);
+    const todoService = createTodoService(todoRepository);
 
-    app.use(createDeviceRoutes(deviceService));
+    app.use(createTodoRoutes(todoService));
     app.use(createStatusRoutes(db));
 
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));

@@ -1,12 +1,12 @@
-# Node.js Device Management API
+# Node.js Todo API
 
 ## Overview
-This project provides an API for managing user devices and checking the API's health status. It is built using Node.js, Express, and Knex.js, with support for Swagger API documentation and Winston for logging.
+This project provides an API for managing user todos and checking the API's health status. It is built using Node.js, Express, and Knex.js, with support for Swagger API documentation and Winston for logging.
 
 ---
 
 ## Features
-- **Device Management:** Retrieve devices by user ID.
+- **Todo Management:** Create, list, update, and delete todos for a user.
 - **Health Status Check:** Verify the API and database connection status.
 - **API Documentation:** Accessible through Swagger UI.
 - **Robust Logging:** Comprehensive logging for errors and information.
@@ -56,7 +56,7 @@ This project provides an API for managing user devices and checking the API's he
    DB_NAME=postgres
    ```
 
-4. Run database migrations if required (assuming Knex is set up):
+4. Run database migrations:
    ```bash
    npx knex migrate:latest
    ```
@@ -81,23 +81,44 @@ http://localhost:8080/api-docs
 
 ## API Endpoints
 
-### **Device Routes**
-| Method | Endpoint            | Description                                       |
-|--------|---------------------|---------------------------------------------------|
-| GET    | `/devices/:user_id`  | Get devices associated with a given user ID.     |
+### **Todo Routes**
+| Method | Endpoint            | Description                                  |
+|--------|----------------------|-----------------------------------------------|
+| GET    | `/todos/:user_id`    | Get todos associated with a given user ID.    |
+| POST   | `/todos`             | Create a todo.                                |
+| PATCH  | `/todos/:todo_id`    | Update a todo's title and/or completed status. |
+| DELETE | `/todos/:todo_id`    | Delete a todo.                                |
 
 #### Example Response
-**GET /devices/q9m18b1frwn1kh4gun8c3g9o**
+**GET /todos/q9m18b1frwn1kh4gun8c3g9o**
 ```json
 [
   {
-    "device_id": "xiiu1zushyiurb8xndqz3osc",
+    "todo_id": "xiiu1zushyiurb8xndqz3osc",
     "user_id": "q9m18b1frwn1kh4gun8c3g9o",
-    "last_charging_timestamp": null
+    "title": "Buy milk",
+    "completed": false
   }
 ]
 ```
-If the user has no devices, the response is `200` with an empty array (`[]`) - an empty result set isn't an error.
+If the user has no todos, the response is `200` with an empty array (`[]`) - an empty result set isn't an error.
+
+**POST /todos**
+```json
+// Request body
+{ "user_id": "q9m18b1frwn1kh4gun8c3g9o", "title": "Buy milk" }
+```
+Returns `201` with the created todo, or `400` if `user_id`/`title` are missing.
+
+**PATCH /todos/:todo_id**
+```json
+// Request body
+{ "completed": true }
+```
+Returns `200` with the updated todo, `400` if neither `title` nor `completed` is provided, or `404` if the todo doesn't exist.
+
+**DELETE /todos/:todo_id**
+Returns `204` on success, or `404` if the todo doesn't exist.
 
 **Error Responses:**
 - 500: Internal server error
@@ -131,22 +152,23 @@ src
 │   └── logger.ts
 │   └── swaggerConfig.ts
 ├── controllers
-│   └── deviceController.ts
+│   └── todoController.ts
 │   └── statusController.ts
 ├── helpers
 │   └── responseHandler.ts
+│   └── databaseHealthCheck.ts
 ├── middleware
 │   └── errorHandler.ts
 │   └── notFoundHandler.ts
 ├── repositories
-│   └── deviceRepository.ts
+│   └── todoRepository.ts
 ├── routes
-│   └── deviceRoutes.ts
+│   └── todoRoutes.ts
 │   └── statusRoutes.ts
 ├── services
-│   └── deviceService.ts
+│   └── todoService.ts
 └── types
-    └── deviceTypes.ts
+    └── todoTypes.ts
 
 migrations/                 -- Knex schema migrations (project root)
 seeds/                      -- Knex seed data (project root)
@@ -156,13 +178,14 @@ knexfile.ts                 -- Knex CLI config (project root)
 ---
 
 ## DB
-The app uses simple DB setup with only one table 
+The app uses simple DB setup with only one table
 
-|               device              |                    
-|-----------------------------------|
-|device_id String PK                |
-|user_id String Not Nul             |
-|last_charging_timestamp   Timestamp|
+|               todo         |
+|-----------------------------|
+|todo_id String PK           |
+|user_id String Not Null     |
+|title String Not Null       |
+|completed Boolean Not Null  |
 
 ## Dependencies
 - **express:** Web framework for Node.js
@@ -197,12 +220,12 @@ npm run lint
 - Verify that the database server is running.
 
 ### API Not Responding
-- Check the logs for errors using the `app.log` file.
+- Check the console/stdout logs for errors.
 
 ---
 
 ## Logging
-- Logs are available in the console and written to `app.log`.
+- Logs are written to the console (stdout) only - colorized plain text in development, structured JSON in production (`NODE_ENV=production`), so a container platform's log collector (e.g. Google Cloud Logging) can capture and parse them.
 - Winston is used for logging, with support for different log levels.
 
 ---
