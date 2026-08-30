@@ -1,10 +1,11 @@
 import dotenv from 'dotenv';
-import app from './app';
+import createApp from './app';
 import db from './config/database';
 import logger from './config/logger';
 
 dotenv.config();
 
+const app = createApp(db);
 const port = process.env.PORT || 8080;
 
 const server = app.listen(port, () => {

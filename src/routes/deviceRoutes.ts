@@ -1,11 +1,15 @@
-import express from 'express';
-import { getDevicesByUserId } from '../controllers/deviceController';
+import express, { Router } from 'express';
+import { DeviceService } from '../services/deviceService';
+import { createDeviceController } from '../controllers/deviceController';
 
-const router = express.Router();
+export const createDeviceRoutes = (deviceService: DeviceService): Router => {
+    const router = express.Router();
+    const deviceController = createDeviceController(deviceService);
 
-router.get('/devices/:user_id', getDevicesByUserId);
+    router.get('/devices/:user_id', deviceController.getDevicesByUserId);
 
-export default router;
+    return router;
+};
 
 /**
  * @openapi

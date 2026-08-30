@@ -1,11 +1,15 @@
-import express from 'express';
-import { getStatus } from '../controllers/statusController';
+import express, { Router } from 'express';
+import { Knex } from 'knex';
+import { createStatusController } from '../controllers/statusController';
 
-const router = express.Router();
+export const createStatusRoutes = (db: Knex): Router => {
+    const router = express.Router();
+    const statusController = createStatusController(db);
 
-router.get('/status', getStatus);
+    router.get('/status', statusController.getStatus);
 
-export default router;
+    return router;
+};
 
 /**
  * @openapi

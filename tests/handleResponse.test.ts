@@ -1,10 +1,10 @@
 
-import { handleResponse, handleError } from '../../src/helpers/responseHandler';
+import { handleResponse, handleError } from '../src/helpers/responseHandler';
 import { Response } from 'express';
-import logger from '../../src/config/logger';
+import logger from '../src/config/logger';
 
 // Mocking winston logger
-jest.mock('../../src/config/logger', () => ({
+jest.mock('../src/config/logger', () => ({
     error: jest.fn(),
     info: jest.fn(),
     warn: jest.fn(),
