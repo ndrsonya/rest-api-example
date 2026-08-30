@@ -64,24 +64,24 @@ describe('Todo routes (integration)', () => {
         });
     });
 
-    describe('PATCH /todos/:todo_id', () => {
+    describe('PUT /todos/:todo_id', () => {
         it('returns 200 with the updated todo', async () => {
             await testDatabase.db('todo').insert({ todo_id: 't1', user_id: 'u1', title: 'Buy milk', completed: false });
 
-            const response = await request(app).patch('/todos/t1').send({ completed: true });
+            const response = await request(app).put('/todos/t1').send({ completed: true });
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual({ todo_id: 't1', user_id: 'u1', title: 'Buy milk', completed: true });
         });
 
         it('returns 404 when the todo does not exist', async () => {
-            const response = await request(app).patch('/todos/missing').send({ completed: true });
+            const response = await request(app).put('/todos/missing').send({ completed: true });
 
             expect(response.status).toBe(404);
         });
 
         it('returns 400 when the body has no updatable fields', async () => {
-            const response = await request(app).patch('/todos/t1').send({});
+            const response = await request(app).put('/todos/t1').send({});
 
             expect(response.status).toBe(400);
         });

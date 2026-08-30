@@ -72,7 +72,7 @@ http://localhost:8080/api-docs
 |--------|----------------------|-----------------------------------------------|
 | GET    | `/todos/:user_id`    | Get todos associated with a given user ID.    |
 | POST   | `/todos`             | Create a todo.                                |
-| PATCH  | `/todos/:todo_id`    | Update a todo's title and/or completed status. |
+| PUT    | `/todos/:todo_id`    | Update a todo's title and/or completed status. |
 | DELETE | `/todos/:todo_id`    | Delete a todo.                                |
 
 #### Example Response
@@ -96,7 +96,7 @@ If the user has no todos, the response is `200` with an empty array (`[]`) - an 
 ```
 Returns `201` with the created todo, or `400` if `user_id`/`title` are missing.
 
-**PATCH /todos/:todo_id**
+**PUT /todos/:todo_id**
 ```json
 // Request body
 { "completed": true }

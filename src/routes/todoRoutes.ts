@@ -8,7 +8,7 @@ export const createTodoRoutes = (todoService: TodoService): Router => {
 
     router.get('/todos/:user_id', todoController.getTodosByUserId);
     router.post('/todos', todoController.createTodo);
-    router.patch('/todos/:todo_id', todoController.updateTodo);
+    router.put('/todos/:todo_id', todoController.updateTodo);
     router.delete('/todos/:todo_id', todoController.deleteTodo);
 
     return router;
@@ -117,7 +117,7 @@ export const createTodoRoutes = (todoService: TodoService): Router => {
 /**
  * @openapi
  * /todos/{todo_id}:
- *   patch:
+ *   put:
  *     summary: Update a todo
  *     description: Updates a todo's title and/or completed status.
  *     parameters:
