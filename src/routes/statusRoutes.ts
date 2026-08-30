@@ -6,16 +6,39 @@ export const createStatusRoutes = (db: Knex): Router => {
     const router = express.Router();
     const statusController = createStatusController(db);
 
-    router.get('/status', statusController.getStatus);
+    router.get('/health/live', statusController.getLiveness);
+    router.get('/health/ready', statusController.getReadiness);
 
     return router;
 };
 
 /**
  * @openapi
- * /status:
+ * /health/live:
  *   get:
- *     summary: Check the health of the API and the database connection
+ *     summary: Liveness probe
+ *     description: Returns 200 as long as the API process is up. Does not check the database - use /health/ready for that.
+ *     responses:
+ *       200:
+ *         description: The API process is alive
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: 'OK'
+ *                 message:
+ *                   type: string
+ *                   example: 'API process is alive.'
+ */
+
+/**
+ * @openapi
+ * /health/ready:
+ *   get:
+ *     summary: Readiness probe - checks the API and the database connection
  *     description: This endpoint returns the status of the API and checks if the database is reachable.
  *     responses:
  *       200:

@@ -102,11 +102,12 @@ http://localhost:8080/api-docs
 - 500: Internal server error
 
 ### **Status Routes**
-| Method | Endpoint | Description                               |
-|--------|----------|-------------------------------------------|
-| GET    | `/status` | Check API health and database connection |
+| Method | Endpoint       | Description                                                       |
+|--------|----------------|---------------------------------------------------------------------|
+| GET    | `/health/live`  | Liveness probe - is the process up? Does not check the database   |
+| GET    | `/health/ready` | Readiness probe - is the API healthy and the database reachable?  |
 
-#### Example Response
+#### Example Response (`/health/ready`)
 ```json
 {
   "status": "OK",

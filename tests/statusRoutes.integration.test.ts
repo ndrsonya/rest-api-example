@@ -17,12 +17,19 @@ describe('Status route (integration)', () => {
     });
 
     it('returns 200 OK when the database connection is healthy', async () => {
-        const response = await request(app).get('/status');
+        const response = await request(app).get('/health/ready');
 
         expect(response.status).toBe(200);
         expect(response.body).toEqual({
             status: 'OK',
             message: 'API is healthy and the database connection is successful!',
         });
+    });
+
+    it('returns 200 OK from the liveness probe', async () => {
+        const response = await request(app).get('/health/live');
+
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual({ status: 'OK', message: 'API process is alive.' });
     });
 });
