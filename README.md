@@ -197,10 +197,16 @@ npm run test:all          # both, one after the other
 
 ---
 
-## Contributing
-Feel free to open issues or submit pull requests for improvements.
+## Out of Scope
+This project is a demo API and intentionally leaves out some things a production deployment would need:
+- **Authentication:** No authentication or authorization is implemented - all endpoints are open. A production version would need to verify caller identity (e.g. OAuth) and enforce that a user can only access their own todos.
+- **Cloud deployment:** The app runs locally via Docker Compose only. There is no live cloud deployment provisioning a managed Postgres instance, hosting the API on a cloud platform, and wiring up secrets management.
+- **Validation:** Validation is minimal - request bodies get basic type/presence checks, and `.env` variables aren't validated at startup. A production version would need a schema-based validation library (e.g. Zod/Joi) for both incoming requests and environment configuration, with clear startup failures for missing/malformed env vars.
+- **Observability:** No observability tooling is set up beyond  logging (see the Logging section above) - there's no metrics collection, distributed tracing, or error monitoring/alerting (e.g. Grafana, OpenTelemetry).
+- **Gateway/load balancing:** There's no reverse proxy or API gateway in front of the app - a single instance handles requests directly. A production deployment would need a gateway (e.g. NGINX, cloud load balancer) to distribute traffic across pods/instances, and handle concerns like rate limiting.
 
 ---
+
 
 ## License
 This project is licensed under [MIT License](LICENSE).
