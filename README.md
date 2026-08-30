@@ -1,12 +1,12 @@
-# Node.js Device Management API
+# Node.js Todo API
 
 ## Overview
-This project provides an API for managing user devices and checking the API's health status. It is built using Node.js, Express, and Knex.js, with support for Swagger API documentation and Winston for logging.
+This project provides an API for managing user todos and checking the API's health status. It is built using Node.js, Express, and Knex.js, with support for Swagger API documentation and Winston for logging.
 
 ---
 
 ## Features
-- **Device Management:** Retrieve devices by user ID.
+- **Todo Management:** Create, list, update, and delete todos for a user.
 - **Health Status Check:** Verify the API and database connection status.
 - **API Documentation:** Accessible through Swagger UI.
 - **Robust Logging:** Comprehensive logging for errors and information.
@@ -19,21 +19,6 @@ This project provides an API for managing user devices and checking the API's he
 ### Pre-requisites:
 - [ ] Docker installed on your machine
 - [ ] Node installed
-
-### Set up local DB
-1. In the project root folder run `docker compose build`
-2. In the project root folder run `docker compose up -d` (runs postgres and PG Admin)
-3. Go to http://localhost:8001 in browser. You'll see a pgAdmin login page
-4. login with email `admin@admin.com` and password `admin`
-5. Right Click on "Servers" -> "Create" -> "Server..."
-
-  ![Screenshot 2024-12-18 at 15 55 09](https://github.com/user-attachments/assets/2c8e0d9e-6173-4b32-90c9-1d30c970bdfd)
-
-6. on "General" tab give server some name
-7. on "Connection" tab set the following Host: postgres, username: postgress, password: postgres
-
-  ![Screenshot 2024-12-18 at 15 57 43](https://github.com/user-attachments/assets/b72598a8-c47d-4461-8c25-0133e39c4b79)
-8. Click "Save"
 
 ### Project Setup
 1. Clone the repository:
@@ -50,16 +35,26 @@ This project provides an API for managing user devices and checking the API's he
 3. Set up environment variables by creating a `.env` file in the root directory with the following content:
    ```env
    PORT=8080
-   DB_HOST=postgres
+   DB_HOST=127.0.0.1
+   DB_PORT=5432
    DB_USER=postgres
    DB_PASSWORD=postgres
    DB_NAME=postgres
    ```
 
-4. Run database migrations if required (assuming Knex is set up):
-   ```bash
-   npx knex migrate:latest
-   ```
+### Set up local DB
+Run:
+```bash
+npm run db:up
+```
+This starts Postgres and pgAdmin via `docker compose` (waiting until Postgres is actually ready to accept connections), then runs migrations and seeds in one shot - no manual pgAdmin clicking required.
+
+If you just want the containers without migrating/seeding, `docker compose up -d --wait` on its own works too; `npm run migrate-and-seed` can be run separately whenever you need to re-apply migrations/seeds.
+
+**Optional - inspect the DB visually:**
+1. Go to http://localhost:8001 and log in with email `admin@admin.com` and password `admin`.
+2. A server named **rest-api-example** is already registered (pointing at the `postgres` container) - no need to create one manually.
+3. Expand it; the first time, pgAdmin will ask for the database password (`postgres`) - check "Save Password" so you won't be asked again.
 
 ---
 
@@ -81,32 +76,55 @@ http://localhost:8080/api-docs
 
 ## API Endpoints
 
-### **Device Routes**
-| Method | Endpoint            | Description                                       |
-|--------|---------------------|---------------------------------------------------|
-| GET    | `/devices/:user_id`  | Get devices associated with a given user ID.     |
+### **Todo Routes**
+| Method | Endpoint            | Description                                  |
+|--------|----------------------|-----------------------------------------------|
+| GET    | `/todos/:user_id`    | Get todos associated with a given user ID.    |
+| POST   | `/todos`             | Create a todo.                                |
+| PATCH  | `/todos/:todo_id`    | Update a todo's title and/or completed status. |
+| DELETE | `/todos/:todo_id`    | Delete a todo.                                |
 
 #### Example Response
-**GET /devices/q9m18b1frwn1kh4gun8c3g9o**
+**GET /todos/q9m18b1frwn1kh4gun8c3g9o**
 ```json
 [
   {
-    "device_id": "xiiu1zushyiurb8xndqz3osc",
+    "todo_id": "xiiu1zushyiurb8xndqz3osc",
     "user_id": "q9m18b1frwn1kh4gun8c3g9o",
-    "last_charging_timestamp": null
+    "title": "Buy milk",
+    "completed": false
   }
 ]
 ```
+If the user has no todos, the response is `200` with an empty array (`[]`) - an empty result set isn't an error.
+
+**POST /todos**
+```json
+// Request body
+{ "user_id": "q9m18b1frwn1kh4gun8c3g9o", "title": "Buy milk" }
+```
+Returns `201` with the created todo, or `400` if `user_id`/`title` are missing.
+
+**PATCH /todos/:todo_id**
+```json
+// Request body
+{ "completed": true }
+```
+Returns `200` with the updated todo, `400` if neither `title` nor `completed` is provided, or `404` if the todo doesn't exist.
+
+**DELETE /todos/:todo_id**
+Returns `204` on success, or `404` if the todo doesn't exist.
+
 **Error Responses:**
-- 404: No devices found for the given user ID
 - 500: Internal server error
 
 ### **Status Routes**
-| Method | Endpoint | Description                               |
-|--------|----------|-------------------------------------------|
-| GET    | `/status` | Check API health and database connection |
+| Method | Endpoint       | Description                                                       |
+|--------|----------------|---------------------------------------------------------------------|
+| GET    | `/health/live`  | Liveness probe - is the process up? Does not check the database   |
+| GET    | `/health/ready` | Readiness probe - is the API healthy and the database reachable?  |
 
-#### Example Response
+#### Example Response (`/health/ready`)
 ```json
 {
   "status": "OK",
@@ -117,37 +135,38 @@ http://localhost:8080/api-docs
 ---
 
 ## Project Structure
+
+A layered architecture: routes hand off to controllers, controllers call a thin service layer, services call the repository, and the repository talks to the DB via Knex.
+
 ```
 src
-├── config
-│   └── logger.ts
-│   └── swaggerConfig.ts
-├── controllers
-│   └── deviceController.ts
-│   └── statusController.ts
-├── db
-│   └── knex.ts
-├── helpers
-│   └── responseHandler.ts
-├── repositories
-│   └── deviceRepository.ts
-├── routes
-│   └── deviceRoutes.ts
-│   └── statusRoutes.ts
-└── types
-    └── deviceTypes.ts
+├── app.ts          -- Express app construction (middleware, routes, error handling)
+├── index.ts        -- starts the server, handles graceful shutdown
+├── config          -- app-wide configuration and setup
+├── controllers     -- handles incoming requests and outgoing responses
+├── helpers         -- shared, reusable utility functions
+├── middleware      -- cross-cutting Express middleware
+├── repositories    -- data access layer
+├── routes          -- API route definitions
+├── services        -- business logic layer
+└── types           -- shared TypeScript type definitions
+
+migrations/          -- Knex schema migrations (project root)
+seeds/               -- Knex seed data (project root)
+knexfile.ts          -- Knex CLI config (project root)
 ```
 
 ---
 
 ## DB
-The app uses simple DB setup with only one table 
+The app uses simple DB setup with only one table
 
-|               device              |                    
-|-----------------------------------|
-|device_id String PK                |
-|user_id String Not Nul             |
-|last_charging_timestamp   Timestamp|
+|               todo         |
+|-----------------------------|
+|todo_id String PK           |
+|user_id String Not Null     |
+|title String Not Null       |
+|completed Boolean Not Null  |
 
 ## Dependencies
 - **express:** Web framework for Node.js
@@ -173,21 +192,18 @@ npm run dev
 npm run lint
 ```
 
----
-
-## Troubleshooting
-
-### Database Connection Issue
-- Ensure the database credentials are correct in the `.env` file.
-- Verify that the database server is running.
-
-### API Not Responding
-- Check the logs for errors using the `app.log` file.
+### Run Tests
+```bash
+npm test                  # unit tests - mocked collaborators, no Docker required
+npm run test:integration  # integration tests - spins up a real Postgres via testcontainers, requires Docker
+npm run test:all          # both, one after the other
+```
 
 ---
+
 
 ## Logging
-- Logs are available in the console and written to `app.log`.
+- Logs are written to the console (stdout) only - colorized plain text in development, structured JSON in production (`NODE_ENV=production`), so a container platform's log collector (e.g. Google Cloud Logging) can capture and parse them.
 - Winston is used for logging, with support for different log levels.
 
 ---

@@ -3,14 +3,14 @@ name: Deploy to Google Cloud
 on:
   push:
     branches:
-      - main  # Trigger the pipeline when pushing to the main branch
+      - main # Trigger the pipeline when pushing to the main branch
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [16.x] 
+        node-version: [22.x]
 
     steps:
       - name: Check out code
@@ -25,46 +25,53 @@ jobs:
         run: |
           npm install
 
-      - name: Run tests
+      - name: Typecheck
+        run: |
+          npm run typecheck
+
+      - name: Run unit tests
         run: |
           npm run test
-          
+
+      - name: Run integration tests
+        run: |
+          npm run test:integration
+
   deploy:
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest
     needs: build
     steps:
-    # Step 1: Check out the code
-    - name: Checkout code
-      uses: actions/checkout@v4
+      # Step 1: Check out the code
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    # Step 2: Authenticate to Google Cloud
-    - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@v2
-      with:
-        credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}  # GitHub secret with your service account credentials
+      # Step 2: Authenticate to Google Cloud
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }} # GitHub secret with your service account credentials
 
-    # Step 3: Set up Google Cloud SDK
-    - name: Set up Google Cloud SDK
-      uses: google-github-actions/setup-gcloud@v1
-      with:
-        project_id: ${{ secrets.GCP_PROJECT_ID }}  # Your Google Cloud project ID
+      # Step 3: Set up Google Cloud SDK
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }} # Your Google Cloud project ID
 
+      # Step 4: Authenticate Docker to GCR (Google Container Registry)
+      - name: Authenticate Docker to GCR
+        run: |
+          gcloud auth configure-docker gcr.io
 
-    # Step 4: Authenticate Docker to GCR (Google Container Registry)
-    - name: Authenticate Docker to GCR
-      run: |
-        gcloud auth configure-docker gcr.io
-        
-    # Step 5: Build and push the Docker image to GCR
-    - name: Build and push Docker image
-      run: |
-        docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest .
-        docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest
+      # Step 5: Build and push the Docker image to GCR
+      - name: Build and push Docker image
+        run: |
+          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest .
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest
 
-    # Step 6: Deploy to Cloud Run
-    - name: Deploy to Cloud Run
-      run: |
-        gcloud run deploy rest-api-example \
-          --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest \
-          --region ${{ secrets.GCP_REGION }} \
-          --allow-unauthenticated \
+      # Step 6: Deploy to Cloud Run
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy rest-api-example \
+            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/rest-api-example:latest \
+            --region ${{ secrets.GCP_REGION }} \
+            --allow-unauthenticated \

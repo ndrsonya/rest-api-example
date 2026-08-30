@@ -1,10 +1,10 @@
 
-import { handleResponse, handleError } from '../../src/helpers/responseHandler';
+import { handleResponse, handleError } from '../src/helpers/responseHandler';
 import { Response } from 'express';
-import logger from '../../src/config/logger';
+import logger from '../src/config/logger';
 
 // Mocking winston logger
-jest.mock('../../src/config/logger', () => ({
+jest.mock('../src/config/logger', () => ({
     error: jest.fn(),
     info: jest.fn(),
     warn: jest.fn(),
@@ -27,19 +27,19 @@ describe('handleResponse', () => {
         expect(res.json).toHaveBeenCalledWith({ message: 'Not Found' });
     });
 
-    it('should return a 404 response when data is an empty array', () => {
-        handleResponse([], res);
-
-        expect(res.status).toHaveBeenCalledWith(404);
-        expect(res.json).toHaveBeenCalledWith({ message: 'Not Found' });
-    });
-
-    it('should return a 404 response with a custom message when data is empty', () => {
-        const customMessage = 'No users found';
-        handleResponse([], res, customMessage);
+    it('should return a 404 response with a custom message when data is null', () => {
+        const customMessage = 'No user found';
+        handleResponse(null, res, customMessage);
 
         expect(res.status).toHaveBeenCalledWith(404);
         expect(res.json).toHaveBeenCalledWith({ message: customMessage });
+    });
+
+    it('should return a 200 response with an empty array when data is an empty array', () => {
+        handleResponse([], res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith([]);
     });
 
     it('should return a 200 response when data is valid', () => {

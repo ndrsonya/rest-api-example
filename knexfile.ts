@@ -13,10 +13,10 @@ const config: { [key: string]: Knex.Config } = {
             ssl: false
         },
         migrations: {
-            directory: './src/db/migrations',
+            directory: './migrations',
         },
         seeds: {
-            directory: './src/db/seeds',
+            directory: './seeds',
         },
     },
     production: {
@@ -31,10 +31,10 @@ const config: { [key: string]: Knex.Config } = {
                 ssl: false
             },
         migrations: {
-            directory: './src/db/migrations',
+            directory: './migrations',
         },
         seeds: {
-            directory: './src/db/seeds',
+            directory: './seeds',
         },
     },
 };

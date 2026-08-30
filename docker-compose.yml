@@ -12,6 +12,11 @@ services:
       - postgres-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 3s
+      retries: 10
 
   pgadmin:
     image: dpage/pgadmin4
@@ -20,10 +25,14 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
       PGADMIN_LISTEN_PORT: 8001
+      PGADMIN_REPLACE_SERVERS_ON_STARTUP: "True"
     ports:
       - "8001:8001"
-    depends_on: 
-      - postgres 
+    volumes:
+      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres-data:
