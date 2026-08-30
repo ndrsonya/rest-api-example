@@ -97,8 +97,9 @@ http://localhost:8080/api-docs
   }
 ]
 ```
+If the user has no devices, the response is `200` with an empty array (`[]`) - an empty result set isn't an error.
+
 **Error Responses:**
-- 404: No devices found for the given user ID
 - 500: Internal server error
 
 ### **Status Routes**

@@ -35,6 +35,16 @@ describe('deviceController', () => {
         expect(res.json).toHaveBeenCalledWith(devices);
     });
 
+    it('returns 200 with an empty array when the user has no devices', async () => {
+        const getDevicesForUser = jest.fn().mockResolvedValue([]);
+        const controller = createDeviceController({ getDevicesForUser } as DeviceService);
+
+        await controller.getDevicesByUserId(buildReq('u1'), res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith([]);
+    });
+
     it('returns 500 when the service throws', async () => {
         const getDevicesForUser = jest.fn().mockRejectedValue(new Error('Error fetching devices'));
         const controller = createDeviceController({ getDevicesForUser } as DeviceService);

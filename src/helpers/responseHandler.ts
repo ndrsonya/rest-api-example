@@ -2,7 +2,7 @@ import { Response } from 'express';
 import logger from '../config/logger';
 
 export const handleResponse = <T>(data: T, res: Response, notFoundMessage: string = 'Not Found') => {
-    if (!data || (Array.isArray(data) && data.length === 0)) {
+    if (!data) {
         return res.status(404).json({ message: notFoundMessage });
     }
 

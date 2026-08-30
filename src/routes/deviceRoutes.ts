@@ -27,7 +27,7 @@ export const createDeviceRoutes = (deviceService: DeviceService): Router => {
  *           example: q9m18b1frwn1kh4gun8c3g9o
  *     responses:
  *       200:
- *         description: A list of devices belonging to the user
+ *         description: A list of devices belonging to the user. Returns an empty array if the user has no devices.
  *         content:
  *           application/json:
  *             schema:
@@ -46,17 +46,6 @@ export const createDeviceRoutes = (deviceService: DeviceService): Router => {
  *               - device_id: "xiiu1zushyiurb8xndqz3osc"
  *                 user_id: "q9m18b1frwn1kh4gun8c3g9o"
  *                 last_charging_timestamp: null
- *       404:
- *         description: No devices found for the given user_id
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *             example:
- *               message: 'No devices found for the given user_id.'
  *       500:
  *         description: Internal server error
  *         content:

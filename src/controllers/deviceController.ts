@@ -9,7 +9,7 @@ export const createDeviceController = (deviceService: DeviceService) => ({
 
         try {
             const devices = await deviceService.getDevicesForUser(user_id);
-            handleResponse<Device[]>(devices, res, 'No devices found for the given user_id.');
+            handleResponse<Device[]>(devices, res);
         } catch (error) {
             handleError(error, res);
         }

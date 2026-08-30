@@ -36,10 +36,10 @@ describe('Device routes (integration)', () => {
         ]);
     });
 
-    it('returns 404 when the user has no devices', async () => {
+    it('returns 200 with an empty array when the user has no devices', async () => {
         const response = await request(app).get('/devices/unknown-user');
 
-        expect(response.status).toBe(404);
-        expect(response.body).toEqual({ message: 'No devices found for the given user_id.' });
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual([]);
     });
 });
