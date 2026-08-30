@@ -201,16 +201,6 @@ npm run test:all          # both, one after the other
 
 ---
 
-## Troubleshooting
-
-### Database Connection Issue
-- Ensure the database credentials are correct in the `.env` file.
-- Verify that the database server is running.
-
-### API Not Responding
-- Check the console/stdout logs for errors.
-
----
 
 ## Logging
 - Logs are written to the console (stdout) only - colorized plain text in development, structured JSON in production (`NODE_ENV=production`), so a container platform's log collector (e.g. Google Cloud Logging) can capture and parse them.
