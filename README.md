@@ -9,7 +9,7 @@ This project provides an API for managing user todos and checking the API's heal
 - **Todo Management:** Create, list, update, and delete todos for a user.
 - **Health Status Check:** Verify the API and database connection status.
 - **API Documentation:** Accessible through Swagger UI.
-- **Robust Logging:** Comprehensive logging for errors and information.
+- **Robust Logging:** Logging for errors and information.
 - **CI/CD pipelines:** For automated releases of new versions (Google cloud hosting is currently off due to paid nature of service and tight author's budget)
 
 
@@ -32,14 +32,9 @@ This project provides an API for managing user todos and checking the API's heal
    npm install
    ```
 
-3. Set up environment variables by creating a `.env` file in the root directory with the following content:
-   ```env
-   PORT=8080
-   DB_HOST=127.0.0.1
-   DB_PORT=5432
-   DB_USER=postgres
-   DB_PASSWORD=postgres
-   DB_NAME=postgres
+3. Set up environment variables:
+   ```bash
+   cp .env.example .env
    ```
 
 ### Set up local DB
@@ -51,10 +46,6 @@ This starts Postgres and pgAdmin via `docker compose` (waiting until Postgres is
 
 If you just want the containers without migrating/seeding, `docker compose up -d --wait` on its own works too; `npm run migrate-and-seed` can be run separately whenever you need to re-apply migrations/seeds.
 
-**Optional - inspect the DB visually:**
-1. Go to http://localhost:8001 and log in with email `admin@admin.com` and password `admin`.
-2. A server named **rest-api-example** is already registered (pointing at the `postgres` container) - no need to create one manually.
-3. Expand it; the first time, pgAdmin will ask for the database password (`postgres`) - check "Save Password" so you won't be asked again.
 
 ---
 
@@ -175,8 +166,6 @@ The app uses simple DB setup with only one table
 - **winston:** Logging library
 - **swagger-jsdoc & swagger-ui-express:** API documentation
 - **Github Actions** For CI/CD pipelines
-- **Google cloud Run and Google cloud SQL** For app and DB hosting (Google cloud hosting is currently off due to paid nature of service and tight author's budget)
-
 
 ---
 
@@ -208,10 +197,16 @@ npm run test:all          # both, one after the other
 
 ---
 
-## Contributing
-Feel free to open issues or submit pull requests for improvements.
+## Out of Scope
+This project is a demo API and intentionally leaves out some things a production deployment would need:
+- **Authentication:** No authentication or authorization is implemented - all endpoints are open. A production version would need to verify caller identity (e.g. OAuth) and enforce that a user can only access their own todos.
+- **Cloud deployment:** The app runs locally via Docker Compose only. There is no live cloud deployment provisioning a managed Postgres instance, hosting the API on a cloud platform, and wiring up secrets management.
+- **Validation:** Validation is minimal - request bodies get basic type/presence checks, and `.env` variables aren't validated at startup. A production version would need a schema-based validation library (e.g. Zod/Joi) for both incoming requests and environment configuration, with clear startup failures for missing/malformed env vars.
+- **Observability:** No observability tooling is set up beyond  logging (see the Logging section above) - there's no metrics collection, distributed tracing, or error monitoring/alerting (e.g. Grafana, OpenTelemetry).
+- **Gateway/load balancing:** There's no reverse proxy or API gateway in front of the app - a single instance handles requests directly. A production deployment would need a gateway (e.g. NGINX, cloud load balancer) to distribute traffic across pods/instances, and handle concerns like rate limiting.
 
 ---
+
 
 ## License
 This project is licensed under [MIT License](LICENSE).
